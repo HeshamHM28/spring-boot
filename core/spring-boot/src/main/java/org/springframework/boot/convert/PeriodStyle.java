@@ -284,4 +284,28 @@ public enum PeriodStyle {
 
 	}
 
+
+    private static boolean isNumeric(String value) {
+    	// Intentionally let this throw NPE if value is null to preserve original behavior.
+    	int len = value.length();
+    	if (len == 0) {
+    		return false;
+    	}
+    	int i = 0;
+    	char c = value.charAt(0);
+    	if (c == '+' || c == '-') {
+    		if (len == 1) {
+    			return false;
+    		}
+    		i = 1;
+    	}
+    	for (; i < len; i++) {
+    		char ch = value.charAt(i);
+    		if (ch < '0' || ch > '9') {
+    			return false;
+    		}
+    	}
+    	return true;
+    }
+
 }
