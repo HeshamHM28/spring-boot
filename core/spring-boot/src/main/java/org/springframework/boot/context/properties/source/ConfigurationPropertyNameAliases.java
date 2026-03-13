@@ -79,6 +79,10 @@ public final class ConfigurationPropertyNameAliases implements Iterable<Configur
 
 	@Override
 	public Iterator<ConfigurationPropertyName> iterator() {
+		// Avoid creating keySet/iterator objects when there are no aliases
+		if (this.aliases.isEmpty()) {
+			return Collections.emptyIterator();
+		}
 		return this.aliases.keySet().iterator();
 	}
 
