@@ -33,13 +33,20 @@ public final class SystemProperties {
 		for (String property : properties) {
 			try {
 				String override = System.getProperty(property);
-				override = (override != null) ? override : System.getenv(property);
+				if (override != null) {
+					return override;
+				}
+				override = System.getenv(property);
 				if (override != null) {
 					return override;
 				}
 			}
 			catch (Throwable ex) {
-				System.err.println("Could not resolve '" + property + "' as system property: " + ex);
+				System.err.println(new StringBuilder("Could not resolve '")
+					.append(property)
+					.append("' as system property: ")
+					.append(ex)
+					.toString());
 			}
 		}
 		return null;
