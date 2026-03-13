@@ -79,7 +79,11 @@ public enum PeriodStyle {
 
 		@Override
 		protected boolean matches(String value) {
-			return NUMERIC.matcher(value).matches() || matcher(value).matches();
+		    // Fast path numeric check without regex to avoid creating matcher for numeric values
+		    if (isNumeric(value)) {
+		        return true;
+		    }
+		    return matcher(value).matches();
 		}
 
 		@Override
@@ -283,5 +287,29 @@ public enum PeriodStyle {
 		}
 
 	}
+
+
+    private static boolean isNumeric(String value) {
+        // Let null propagate as NullPointerException to match original behavior.
+        int length = value.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        char c = value.charAt(0);
+        if (c == '+' || c == '-') {
+            if (length == 1) {
+                return false; // sign only, not valid
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char ch = value.charAt(i);
+            if (ch < '0' || ch > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
