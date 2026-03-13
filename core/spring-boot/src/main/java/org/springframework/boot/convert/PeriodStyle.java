@@ -207,9 +207,35 @@ public enum PeriodStyle {
 	 */
 	public static PeriodStyle detect(String value) {
 		Assert.notNull(value, "'value' must not be null");
-		for (PeriodStyle candidate : values()) {
-			if (candidate.matches(value)) {
-				return candidate;
+		int len = value.length();
+		boolean isoCandidate = false;
+		if (len > 0) {
+			char c0 = value.charAt(0);
+			if (c0 == 'P' || c0 == 'p') {
+				isoCandidate = true;
+			}
+			else if ((c0 == '+' || c0 == '-') && len > 1) {
+				char c1 = value.charAt(1);
+				if (c1 == 'P' || c1 == 'p') {
+					isoCandidate = true;
+				}
+			}
+		}
+		// Prefer checking the likely candidate first to avoid unnecessary regex work.
+		if (isoCandidate) {
+			if (ISO8601.matches(value)) {
+				return ISO8601;
+			}
+			if (SIMPLE.matches(value)) {
+				return SIMPLE;
+			}
+		}
+		else {
+			if (SIMPLE.matches(value)) {
+				return SIMPLE;
+			}
+			if (ISO8601.matches(value)) {
+				return ISO8601;
 			}
 		}
 		throw new IllegalArgumentException("'" + value + "' is not a valid period");
