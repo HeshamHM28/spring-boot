@@ -103,7 +103,32 @@ public class ConfigTreePropertySource extends EnumerablePropertySource<Path>
 	 * @param options the property source options
 	 */
 	public ConfigTreePropertySource(String name, Path sourceDirectory, Option... options) {
-		this(name, sourceDirectory, EnumSet.copyOf(Arrays.asList(options)));
+		super(name, sourceDirectory);
+		// Efficiently build EnumSet from varargs without unnecessary intermediate list
+		Set<Option> opts;
+		if (options == null || options.length == 0) {
+			opts = EnumSet.noneOf(Option.class);
+		}
+		else if (options.length == 1) {
+			opts = EnumSet.of(options[0]);
+		}
+		else {
+			EnumSet<Option> set = EnumSet.noneOf(Option.class);
+			for (Option o : options) {
+				set.add(o);
+			}
+			opts = set;
+		}
+		// Delegate to main constructor logic
+		Assert.isTrue(Files.exists(sourceDirectory),
+				() -> "'sourceDirectory' [%s] must exist".formatted(sourceDirectory));
+		Assert.isTrue(Files.isDirectory(sourceDirectory),
+				() -> "'sourceDirectory' [%s] must be a directory".formatted(sourceDirectory));
+		Map<String, PropertyFile> found = PropertyFile.findAll(sourceDirectory, opts);
+		this.propertyFiles = found;
+		this.options = opts;
+		// Build names array with exact size to avoid additional temporary allocations
+		this.names = found.keySet().toArray(new String[found.size()]);
 	}
 
 	private ConfigTreePropertySource(String name, Path sourceDirectory, Set<Option> options) {
