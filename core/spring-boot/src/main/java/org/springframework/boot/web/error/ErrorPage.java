@@ -35,23 +35,27 @@ public class ErrorPage {
 	private final @Nullable Class<? extends Throwable> exception;
 
 	private final String path;
+    private final boolean isGlobal;
 
 	public ErrorPage(String path) {
 		this.status = null;
 		this.exception = null;
 		this.path = path;
+		this.isGlobal = true;
 	}
 
 	public ErrorPage(HttpStatus status, String path) {
 		this.status = status;
 		this.exception = null;
 		this.path = path;
+		this.isGlobal = false;
 	}
 
 	public ErrorPage(Class<? extends Throwable> exception, String path) {
 		this.status = null;
 		this.exception = exception;
 		this.path = path;
+		this.isGlobal = false;
 	}
 
 	/**
@@ -103,7 +107,7 @@ public class ErrorPage {
 	 * @return if this is a global error page
 	 */
 	public boolean isGlobal() {
-		return (this.status == null && this.exception == null);
+		return this.isGlobal;
 	}
 
 	@Override
