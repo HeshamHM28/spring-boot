@@ -58,6 +58,7 @@ public class DelegatingFilterProxyRegistrationBean extends AbstractFilterRegistr
 	private ApplicationContext applicationContext;
 
 	private final String targetBeanName;
+    private volatile DelegatingFilterProxy filter;
 
 	/**
 	 * Create a new {@link DelegatingFilterProxyRegistrationBean} instance to be
@@ -85,14 +86,22 @@ public class DelegatingFilterProxyRegistrationBean extends AbstractFilterRegistr
 
 	@Override
 	public DelegatingFilterProxy getFilter() {
-		return new DelegatingFilterProxy(this.targetBeanName, getWebApplicationContext()) {
-
-			@Override
-			protected void initFilterBean() throws ServletException {
-				// Don't initialize filter bean on init()
+		DelegatingFilterProxy result = this.filter;
+		if (result == null) {
+			synchronized (this) {
+				result = this.filter;
+				if (result == null) {
+					result = new DelegatingFilterProxy(this.targetBeanName, getWebApplicationContext()) {
+						@Override
+						protected void initFilterBean() throws ServletException {
+							// Don't initialize filter bean on init()
+						}
+					};
+					this.filter = result;
+				}
 			}
-
-		};
+		}
+		return result;
 	}
 
 	private WebApplicationContext getWebApplicationContext() {
