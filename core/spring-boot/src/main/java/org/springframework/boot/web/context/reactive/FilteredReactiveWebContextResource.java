@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
 class FilteredReactiveWebContextResource extends AbstractResource {
 
 	private final String path;
+    private static final boolean EXISTS = false;
 
 	FilteredReactiveWebContextResource(String path) {
 		this.path = path;
@@ -44,7 +45,7 @@ class FilteredReactiveWebContextResource extends AbstractResource {
 
 	@Override
 	public boolean exists() {
-		return false;
+		return EXISTS;
 	}
 
 	@Override
