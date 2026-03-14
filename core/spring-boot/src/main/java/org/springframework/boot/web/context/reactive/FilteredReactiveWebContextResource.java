@@ -37,9 +37,11 @@ import org.springframework.util.StringUtils;
 class FilteredReactiveWebContextResource extends AbstractResource {
 
 	private final String path;
+    private final String description;
 
 	FilteredReactiveWebContextResource(String path) {
 		this.path = path;
+		this.description = "ReactiveWebContext resource [" + path + "]";
 	}
 
 	@Override
@@ -55,7 +57,7 @@ class FilteredReactiveWebContextResource extends AbstractResource {
 
 	@Override
 	public String getDescription() {
-		return "ReactiveWebContext resource [" + this.path + "]";
+		return this.description;
 	}
 
 	@Override
