@@ -93,8 +93,18 @@ public class PropertySourceOrigin implements Origin, OriginProvider {
 
 	@Override
 	public String toString() {
-		return (this.origin != null) ? this.origin.toString()
-				: "\"" + this.propertyName + "\" from property source \"" + this.propertySource.getName() + "\"";
+		if (this.origin != null) {
+			return this.origin.toString();
+		}
+		// Cache fields locally and pre-size the StringBuilder to avoid repeated resizing and temporaries
+		String prop = this.propertyName;
+		String sourceName = this.propertySource.getName();
+		// Estimated constant parts: two surrounding quotes for prop and sourceName and ' from property source ' literal
+		// literal length = 1 (") + 1 (") + 1 (") + 1 (") + length of ' from property source ' (21) => combined accounted below
+		int estimatedCapacity = prop.length() + sourceName.length() + 28;
+		StringBuilder sb = new StringBuilder(estimatedCapacity);
+		sb.append('"').append(prop).append("\" from property source \"").append(sourceName).append('"');
+		return sb.toString();
 	}
 
 	/**
