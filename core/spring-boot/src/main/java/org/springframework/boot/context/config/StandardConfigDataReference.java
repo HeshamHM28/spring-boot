@@ -43,6 +43,7 @@ class StandardConfigDataReference {
 	private final PropertySourceLoader propertySourceLoader;
 
 	private final @Nullable Charset encoding;
+    private final int resourceLocationHash;
 
 	/**
 	 * Create a new {@link StandardConfigDataReference} instance.
@@ -62,6 +63,7 @@ class StandardConfigDataReference {
 		this.configDataLocation = configDataLocation;
 		String profileSuffix = (StringUtils.hasText(profile)) ? "-" + profile : "";
 		this.resourceLocation = root + profileSuffix + ((extension != null) ? "." + extension : "");
+		this.resourceLocationHash = this.resourceLocation.hashCode();
 		this.directory = directory;
 		this.profile = profile;
 		this.propertySourceLoader = propertySourceLoader;
@@ -109,6 +111,9 @@ class StandardConfigDataReference {
 			return false;
 		}
 		StandardConfigDataReference other = (StandardConfigDataReference) obj;
+		if (this.resourceLocationHash != other.resourceLocationHash) {
+			return false;
+		}
 		return this.resourceLocation.equals(other.resourceLocation);
 	}
 
