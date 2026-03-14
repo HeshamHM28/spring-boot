@@ -63,7 +63,10 @@ public interface IterableConfigurationPropertySource
 
 	@Override
 	default ConfigurationPropertyState containsDescendantOf(ConfigurationPropertyName name) {
-		return ConfigurationPropertyState.search(this, name::isAncestorOf);
+		// Capture the predicate in a local variable to make the lambda allocation
+		// and call-site slightly more explicit and JIT-friendly.
+		Predicate<ConfigurationPropertyName> predicate = name::isAncestorOf;
+		return ConfigurationPropertyState.search(this, predicate);
 	}
 
 	@Override
