@@ -31,7 +31,14 @@ public class WhitespaceThrowableProxyConverter extends ThrowableProxyConverter {
 
 	@Override
 	protected String throwableProxyToString(IThrowableProxy tp) {
-		return CoreConstants.LINE_SEPARATOR + super.throwableProxyToString(tp) + CoreConstants.LINE_SEPARATOR;
+		// Cache separator and the super result to avoid repeated accesses/concatenation allocations.
+		String sep = CoreConstants.LINE_SEPARATOR;
+		String s = super.throwableProxyToString(tp);
+		// If s is null, concatenation would produce "null", which has length 4.
+		int sLen = (s == null) ? 4 : s.length();
+		StringBuilder sb = new StringBuilder(sep.length() * 2 + sLen);
+		sb.append(sep).append(s).append(sep);
+		return sb.toString();
 	}
 
 }
