@@ -84,7 +84,17 @@ public interface ConfigurationPropertySource {
 	 * @since 2.5.0
 	 */
 	default ConfigurationPropertySource withPrefix(@Nullable String prefix) {
-		return (StringUtils.hasText(prefix)) ? new PrefixedConfigurationPropertySource(this, prefix) : this;
+		// Inline the "has text" check to avoid an extra method call and potential allocations.
+		if (prefix == null) {
+			return this;
+		}
+		int len = prefix.length();
+		for (int i = 0; i < len; i++) {
+			if (!Character.isWhitespace(prefix.charAt(i))) {
+				return new PrefixedConfigurationPropertySource(this, prefix);
+			}
+		}
+		return this;
 	}
 
 	/**
