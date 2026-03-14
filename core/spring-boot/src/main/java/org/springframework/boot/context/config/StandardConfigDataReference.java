@@ -60,8 +60,19 @@ class StandardConfigDataReference {
 			@Nullable String profile, @Nullable String extension, PropertySourceLoader propertySourceLoader,
 			@Nullable Charset encoding) {
 		this.configDataLocation = configDataLocation;
-		String profileSuffix = (StringUtils.hasText(profile)) ? "-" + profile : "";
-		this.resourceLocation = root + profileSuffix + ((extension != null) ? "." + extension : "");
+		boolean hasProfileText = StringUtils.hasText(profile);
+		// Build the resource location with a single StringBuilder to avoid multiple temporary strings.
+		int estimatedLength = root.length() + (hasProfileText ? 1 + profile.length() : 0)
+				+ (extension != null ? 1 + extension.length() : 0);
+		StringBuilder sb = new StringBuilder(estimatedLength);
+		sb.append(root);
+		if (hasProfileText) {
+			sb.append('-').append(profile);
+		}
+		if (extension != null) {
+			sb.append('.').append(extension);
+		}
+		this.resourceLocation = sb.toString();
 		this.directory = directory;
 		this.profile = profile;
 		this.propertySourceLoader = propertySourceLoader;
