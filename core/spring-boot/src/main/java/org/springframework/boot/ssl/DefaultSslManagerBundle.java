@@ -35,6 +35,7 @@ class DefaultSslManagerBundle implements SslManagerBundle {
 	private final SslStoreBundle storeBundle;
 
 	private final SslBundleKey key;
+    private static final java.util.concurrent.ConcurrentMap<String, java.security.Provider> TRUST_MANAGER_FACTORY_PROVIDER_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
 	DefaultSslManagerBundle(@Nullable SslStoreBundle storeBundle, @Nullable SslBundleKey key) {
 		this.storeBundle = (storeBundle != null) ? storeBundle : SslStoreBundle.NONE;
@@ -82,7 +83,20 @@ class DefaultSslManagerBundle implements SslManagerBundle {
 	}
 
 	protected TrustManagerFactory getTrustManagerFactoryInstance(String algorithm) throws NoSuchAlgorithmException {
-		return TrustManagerFactory.getInstance(algorithm);
+		java.security.Provider provider = TRUST_MANAGER_FACTORY_PROVIDER_CACHE.get(algorithm);
+		if (provider != null) {
+			// Use provider-specific overload to avoid provider discovery cost.
+			return TrustManagerFactory.getInstance(algorithm, provider);
+		}
+		// First-time lookup: perform full getInstance and cache the Provider for future calls.
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
+		java.security.Provider existing = TRUST_MANAGER_FACTORY_PROVIDER_CACHE.putIfAbsent(algorithm, tmf.getProvider());
+		// If another thread beat us to caching, prefer the cached provider for subsequent calls.
+		if (existing != null) {
+			// Return a new instance using the cached provider to maintain behavior consistency.
+			return TrustManagerFactory.getInstance(algorithm, existing);
+		}
+		return tmf;
 	}
 
 }
