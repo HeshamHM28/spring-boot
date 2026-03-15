@@ -91,7 +91,11 @@ class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 	 */
 	int getExitCode() {
 		int exitCode = 0;
-		for (ExitCodeGenerator generator : this.generators) {
+		// Cache the list reference to avoid repeated field access in the loop
+		final List<ExitCodeGenerator> gens = this.generators;
+		Iterator<ExitCodeGenerator> it = gens.iterator();
+		while (it.hasNext()) {
+			ExitCodeGenerator generator = it.next();
 			try {
 				int value = generator.getExitCode();
 				if (value != 0) {
