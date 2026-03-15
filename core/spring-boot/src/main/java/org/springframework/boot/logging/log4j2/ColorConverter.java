@@ -153,7 +153,8 @@ public final class ColorConverter extends LogEventPatternConverter {
 		if (options.length >= 2 && options[1] != null) {
 			String[] optionParts = options[1].split(",");
 			for (String optionPart : optionParts) {
-				AnsiElement element = ELEMENTS.get(optionPart.trim().toLowerCase(Locale.ROOT));
+				String normalizedKey = optionPart.trim().toLowerCase(Locale.ROOT);
+				AnsiElement element = ELEMENTS.get(normalizedKey);
 				if (element != null) {
 					stylings.add(element);
 				}
