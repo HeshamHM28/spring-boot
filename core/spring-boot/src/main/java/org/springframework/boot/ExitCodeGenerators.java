@@ -81,7 +81,13 @@ class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 
 	@Override
 	public Iterator<ExitCodeGenerator> iterator() {
-		return this.generators.iterator();
+		// Cache the field in a local variable to reduce field access cost and
+		// avoid allocating a new ArrayList iterator when the list is empty.
+		List<ExitCodeGenerator> g = this.generators;
+		if (g.isEmpty()) {
+			return java.util.Collections.emptyIterator();
+		}
+		return g.iterator();
 	}
 
 	/**
