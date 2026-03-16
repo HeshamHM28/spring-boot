@@ -37,10 +37,12 @@ public abstract class DataObjectPropertyName {
 	public static String toDashedForm(String name) {
 		StringBuilder result = new StringBuilder(name.length());
 		boolean inIndex = false;
+		char lastChar = 0;
 		for (int i = 0; i < name.length(); i++) {
 			char ch = name.charAt(i);
 			if (inIndex) {
 				result.append(ch);
+				lastChar = ch;
 				if (ch == ']') {
 					inIndex = false;
 				}
@@ -49,13 +51,19 @@ public abstract class DataObjectPropertyName {
 				if (ch == '[') {
 					inIndex = true;
 					result.append(ch);
+					lastChar = ch;
 				}
 				else {
-					ch = (ch != '_') ? ch : '-';
-					if (Character.isUpperCase(ch) && !result.isEmpty() && result.charAt(result.length() - 1) != '-') {
-						result.append('-');
+					if (ch == '_') {
+						ch = '-';
 					}
-					result.append(Character.toLowerCase(ch));
+					if (Character.isUpperCase(ch) && lastChar != 0 && lastChar != '-') {
+						result.append('-');
+						lastChar = '-';
+					}
+					char lower = Character.toLowerCase(ch);
+					result.append(lower);
+					lastChar = lower;
 				}
 			}
 		}
