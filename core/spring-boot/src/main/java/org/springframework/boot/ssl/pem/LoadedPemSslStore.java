@@ -45,12 +45,14 @@ final class LoadedPemSslStore implements PemSslStore {
 	private final Supplier<CertificatesHolder> certificatesSupplier;
 
 	private final Supplier<PrivateKeyHolder> privateKeySupplier;
+    private final @Nullable String alias;
 
 	LoadedPemSslStore(PemSslStoreDetails details, ResourceLoader resourceLoader) {
 		Assert.notNull(details, "'details' must not be null");
 		Assert.notNull(resourceLoader, "'resourceLoader' must not be null");
 		this.details = details;
 		this.resourceLoader = resourceLoader;
+		this.alias = details.alias();
 		this.certificatesSupplier = supplier(() -> loadCertificates(details, resourceLoader));
 		this.privateKeySupplier = supplier(() -> loadPrivateKey(details, resourceLoader));
 	}
@@ -86,7 +88,7 @@ final class LoadedPemSslStore implements PemSslStore {
 
 	@Override
 	public @Nullable String alias() {
-		return this.details.alias();
+		return this.alias;
 	}
 
 	@Override
