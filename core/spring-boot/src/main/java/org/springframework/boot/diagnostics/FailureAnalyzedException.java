@@ -58,11 +58,10 @@ public class FailureAnalyzedException extends RuntimeException {
 	}
 
 	static @Nullable FailureAnalysis analyze(Throwable failure) {
-		while (failure != null) {
-			if (failure instanceof FailureAnalyzedException failureAnalyzedException) {
+		for (Throwable current = failure; current != null; current = current.getCause()) {
+			if (current instanceof FailureAnalyzedException failureAnalyzedException) {
 				return failureAnalyzedException.analysis();
 			}
-			failure = failure.getCause();
 		}
 		return null;
 	}
