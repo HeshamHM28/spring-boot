@@ -32,7 +32,8 @@ class ClassPathResourceFilePathResolver implements ApplicationResourceLoader.Fil
 
 	@Override
 	public @Nullable String resolveFilePath(String location, Resource resource) {
-		return (resource instanceof ClassPathResource && !isClassPathUrl(location)) ? location : null;
+		// Inline the classpath URL prefix check to avoid an extra method call.
+		return (resource instanceof ClassPathResource && !location.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) ? location : null;
 	}
 
 	private boolean isClassPathUrl(String location) {
